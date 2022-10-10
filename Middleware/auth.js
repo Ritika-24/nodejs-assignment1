@@ -13,8 +13,8 @@ const verifyToken = (request, response, next) => {
         .status(403)
         .send("A token is required for authentication");
     } else {
-      const bearer = token.split(" ");
-      const decoded = jwt.verify(token, bearer[1]);
+      //const bearer = token.split(" ");
+      const decoded = jwt.verify(token, process.env.JWTPRIVATEKEY);
       request.user = decoded;
     }
   } catch (err) {
