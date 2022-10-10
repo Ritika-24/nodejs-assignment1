@@ -1,0 +1,30 @@
+{
+  "name": "assignment1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ritika-24/nodejs-assignment1.git"
+  },
+  "author": "Ritika",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ritika-24/nodejs-assignment1/issues"
+  },
+  "homepage": "https://github.com/Ritika-24/nodejs-assignment1#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "nodemon": "^2.0.20",
+    "oracledb": "^5.5.0"
+  }
+}
