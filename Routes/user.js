@@ -1,20 +1,21 @@
 const db = require("../Config/database");
-const oracledb = require("oracledb");
+const oracleDB = require("oracledb");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const express = require("express");
 const auth_login = require("../Middleware/auth");
 const { config } = require("dotenv");
 
 const router = express.Router();
 
-//user register
-router.post("/register", async (request, response, next) => {
+//user registration
+router.post("/register", async (request, response) => {
   try {
     //get user input
     const user = {
       first_name: request.body.first_name,
       last_name: request.body.last_name,
-      email: request.body.email,
+      email: request.body.email.toLowerCase(),
       password: request.body.password,
     };
 
@@ -26,97 +27,76 @@ router.post("/register", async (request, response, next) => {
     //Encrypt password
     await bcrypt.genSalt(Number(process.env.SALT), (err, salt) => {
       if (err) {
-        return next(err);
+        return response.send(err);
       }
+      //console.log(salt);
+
       bcrypt.hash(user.password, salt, (err, hash) => {
         if (err) {
-          return next(err);
+          return console.log("Cannot encrypt");
         }
-        email.hashedPassword = hash;
+        user.password = hash;
+        //console.log("Hashed password- ", user.password);
 
-        //insert user details
-        insertUser(user, (err) => {
-          let payload;
+        //connection with db
+        oracleDB.getConnection(db.database, (err, connection) => {
           if (err) {
-            return next(err);
+            response.send("Database connection error - ", err);
+          } else {
+            //inserting user details
+            const query =
+              "insert into users values('" +
+              user.first_name +
+              "','" +
+              user.last_name +
+              "','" +
+              user.email +
+              "','" +
+              user.password +
+              "')";
+            connection.execute(query, [], { autoCommit: true }, (err) => {
+              if (err) {
+                response.send(err.message);
+              } else {
+                // console.log('executing..')
+                let payload;
+                payload = {
+                  sub: user.email,
+                };
+
+                //returning user details
+                response.status(200).json({
+                  message: "User registered successfully",
+                  user: {
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    email: user.email,
+                    password: user.password,
+                  },
+                  token: jwt.sign(payload, process.env.JWTPRIVATEKEY, {
+                    expiresIn: "1h",
+                  }),
+                });
+              }
+            });
+            connection.release(function (err) {
+              if (err) {
+                console.error(err.message);
+              }
+            });
           }
-
-          payload = {
-            sub: user.email,
-          };
-
-          response.status(200).json({
-            user: user,
-            token: jwt.sign(payload, process.env.JWTPRIVATEKEY, {
-              expiresIn: "1h",
-            }),
-          });
         });
       });
     });
-
   } catch (err) {
     console.log(err);
     response.send("An error occured");
   }
 });
 
-//Get authenticated user details
-router.get('/register/get', auth_login, (request, response) => {
-
-  try {
-    oracledb.getConnection(db.database, async (err, connection) => {
-      if (err) {
-        response.send("Database connection error - ", err);
-      }
-
-      const result = await connection.execute(
-        "select * from users",
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-        (err) => {
-          if (err) {
-            console.error(err.message);
-          }
-        }
-      );
-
-      response.status(200).send(result);
-      connection.release((err) => {
-        if (err) {
-          console.error(err.message);
-        }
-      });
-    });
-  } catch (err) {
-    console.error(err);
-    response.send("An error occured");
-  }
+//user authorization
+router.get("/get-auth", auth_login, (request, response) => {
+  console.log("User authorized successfully");
 });
-
-function insertUser(user, err) {
-    oracledb.getConnection(db.database, (err, connection) => {
-      if (err) {
-        response.send("Database connection error - ", err);
-      }
-
-      connection.execute(
-        `Insert into users values(${user.first_name},${user.last_name},${user.email},${user.password})`,
-        [],
-        {
-          autoCommit: true,
-        },
-        (err)=>{
-          if (err) {
-            console.error(err.message);
-          }
-        }
-      );
-      connection.release((err) => {
-        if (err) {
-          console.error(err.message);
-        }
-      });
-    });
-}
 
 module.exports = router;
