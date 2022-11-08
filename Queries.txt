@@ -1,0 +1,5 @@
+//query for creating table
+create table users (first_name varchar2(30) not null, last_name varchar2(35) not null,email varchar2(30) not null, password varchar2(90) not null);
+
+//query for retrival
+select * from users;

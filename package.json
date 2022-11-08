@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ritika-24/nodejs-assignment1.git"
+    "url": "git+https://github.com/ritika-choudhary_psl/Nodejs_Assignment-1.git"
   },
   "author": "Ritika",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Ritika-24/nodejs-assignment1/issues"
+    "url": "https://github.com/ritika-choudhary_psl/Nodejs_Assignment-1.git/issues"
   },
-  "homepage": "https://github.com/Ritika-24/nodejs-assignment1#readme",
+  "homepage": "https://github.com/ritika-choudhary_psl/Nodejs_Assignment-1.git#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",

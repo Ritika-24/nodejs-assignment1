@@ -1,9 +1,21 @@
+const oracleDB = require("oracledb");
 
-module.exports = {
-  database: {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    connectionString:"localhost:1521/xe"
-      //"(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)))",
+const database = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  connectionString: "localhost:1521/xe",
+};
+
+const dbConnection = async () => {
+  try {
+    const conn = await oracleDB.getConnection(database);
+    console.log("Database Connected successfully!!");
+    return conn;
+  } catch (err) {
+    console.log("Database Connection error occured!!");
+    console.error(err.message);
   }
 };
+
+module.exports = dbConnection ;
+
